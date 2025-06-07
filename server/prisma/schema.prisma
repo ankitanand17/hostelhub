@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+// ENUM for user roles
+enum Role {
+  STUDENT
+  WARDEN
+  HOSTEL_ADMIN
+  MESS_ADMIN
+  CARETAKER
+}
+
+// NEW: ENUM for student admin sub-roles
+enum AdminSubRole {
+  PREFECT
+  ASSISTANT_PREFECT
+  MESS_MANAGER
+}
+
+// ENUM for academic schools
+enum School {
+  SCHOOL_OF_ENGINEERING
+  SCHOOL_OF_SCIENCE
+  HUMANITIES_AND_SOCIAL_SCIENCES // Represents "HSS"
+}
+
+// Core user model for authentication and role management
+model User {
+  id        String  @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String  @unique
+  password  String
+  role      Role    @default(STUDENT)
+  isActive  Boolean @default(true)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  studentProfile StudentProfile?
+  staffProfile   StaffProfile?
+}
+
+// Profile for students, including student admins
+model StudentProfile {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  rollNumber           String @unique
+  department           String // e.g., "Computer Science & Engineering"
+  school               School // Using the new enum
+  studentContactNumber String
+  guardianName         String
+  guardianContact      String
+  cgpa                 Float?
+  sgpa                 Float?
+
+  // Room allocation (to be linked later)
+  // roomId String?
+
+  // Academic tenure for automation
+  courseStartDate      DateTime
+  expectedCourseEndDate DateTime
+
+  // Student's active status in the hostel
+  isActive Boolean @default(true)
+
+  // The specific title/sub-role for a student admin
+  adminSubRole        AdminSubRole?
+
+  // Tenure fields for student admin roles
+  adminRoleAssignedAt DateTime?
+  adminRoleEndedAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Profile for staff (Warden, Caretaker) - Unchanged from previous version
+model StaffProfile {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  staffContactNumber String
+  department         String
+  officeLocation     String?
+  jobTitle           String
+  description        String?
+  isActive           Boolean   @default(true)
+  startDate          DateTime  @default(now())
+  endDate            DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
