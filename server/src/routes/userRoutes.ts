@@ -1,7 +1,7 @@
 // server/src/routes/userRoutes.ts
 import { Router } from 'express';
 import { authenticateToken, authorizeRole } from '../middleware/authMiddleware';
-import { promoteStudent, demoteStudent } from '../controllers/userController';
+import { promoteStudent, demoteStudent, createStudentUser } from '../controllers/userController';
 
 const router = Router();
 
@@ -14,5 +14,8 @@ router.post('/promote', promoteStudent);
 
 //Route for demoting a student
 router.post('/demote', demoteStudent);
+
+//Route for creating a new student
+router.post('/create-student', createStudentUser);
 
 export default router;

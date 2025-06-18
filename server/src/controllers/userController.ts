@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import prisma from '../lib/prisma';
 import { Role, AdminSubRole, Prisma} from '../generated/prisma';
+import bcrypt from 'bcryptjs';
 
 // A map to validate that the sub-role corresponds to the main role
 const roleToSubRoleMap: Record<string, AdminSubRole[]> = {
@@ -110,5 +111,39 @@ export const demoteStudent = async (req: AuthenticatedRequest, res: Response): P
         }
         console.error(error);
         res.status(500).json({ message: 'An error occurred while demoting the student.' });
+    }
+};
+
+/*Create a basic Student user account */
+export const createStudentUser = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const {firstName, lastName, email, password} = req.body;
+
+    if(!firstName || !lastName || !email || !password){
+        res.status(400).json({message: 'firstName, lastName, email and a temporary password are required.'});
+        return;
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(password,10);
+
+        const newUser = await prisma.user.create({
+            data:{
+                firstName,
+                lastName,
+                email,
+                password:hashedPassword,
+                role: 'STUDENT'
+            },
+        });
+
+        const {password: _, ...userWithoutPassword} = newUser;
+        res.status(201).json({message: 'Student user account create successfully.', user: userWithoutPassword});
+    }catch(error: any){
+        if(error.code === 'P2002'){
+            res.status(409).json({message: 'A user with this email already exists.'});
+            return;
+        }
+        console.error(error);
+        res.status(500).json({message: 'An error occured while creating a student user.'});
     }
 };
