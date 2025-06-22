@@ -27,6 +27,11 @@ const WardenDashboard = () => {
                         description="Create a user account for a new student"
                         icon="👤+"
                     />
+                    <ActionCard to="/admin/add-staff"
+                        title="Add new Warden or CareTaker"
+                        description="Onboard a new Warden or Caretaker account."
+                        icon="🧑‍🔧"
+                    />
                 </div>
             </div>
         </div>

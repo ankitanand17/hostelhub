@@ -1,5 +1,5 @@
 //src/App.tsx
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, RouterProvider } from "react-router-dom";
 // Layouts
 import MainLayout from "./components/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -12,6 +12,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import CommitteePage from "./pages/CommitteePage";
 import RegisterStudentPage from "./pages/admin/RegisterStudentPage";
 import UpdateStaffProfilePage from "./pages/admin/StaffProfilePage";
+import CreateStaffPage from "./pages/admin/CreateStaffPage";
 
 function App() {
   return(
@@ -28,6 +29,7 @@ function App() {
           <Route element={<ProfileCompletionGuard />}> 
             <Route path="/dashboard" element={<DashboardPage />}/>
             <Route path="/admin/add-student" element={<RegisterStudentPage />}/>
+            <Route path="/admin/add-staff" element={<CreateStaffPage />}/>
           </Route>
           
         </Route>

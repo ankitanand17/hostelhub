@@ -215,3 +215,43 @@ export const createOrUpdateMyStaffProfile = async (req: AuthenticatedRequest, re
         res.status(500).json({message: "An error occur while updating staff profile."});
     }
 };
+
+/*Create a basic Warden or Caretaker user account */
+export const createStaffUser = async(req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const {firstName, lastName, email, password, role} = req.body;
+
+    if(!firstName || !lastName || !email || !password){
+        res.status(400).json({message: 'firstName, lastName, email and a temporary password are required.'});
+        return;
+    }
+    
+    if (role !== 'WARDEN' && role !== 'CARETAKER') {
+        res.status(400).json({ message: 'Invalid role specified. Must be WARDEN or CARETAKER.' });
+        return;
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(password,10);
+
+        const newUser = await prisma.user.create({
+            data:{
+                firstName,
+                lastName,
+                email,
+                password:hashedPassword,
+                role: role as Role,
+                isActive: true,
+            },
+        });
+
+        const {password: _, ...userWithoutPassword} = newUser;
+        res.status(201).json({message: 'Staff user account created successfully.', user: userWithoutPassword});
+    }catch(error: any){
+        if(error.code === 'P2002'){
+            res.status(409).json({message: 'A user with this email already exists.'});
+            return;
+        }
+        console.error(error);
+        res.status(500).json({message: 'An error occurred while creating the staff user.'});
+    }
+}

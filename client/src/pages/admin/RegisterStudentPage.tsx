@@ -1,9 +1,11 @@
 //src/pages/admin/RegisterStudentPage.tsx
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
 const RegisterStudentPage = () => {
+    const navigate = useNavigate();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -32,6 +34,10 @@ const RegisterStudentPage = () => {
             });
             setSuccess(`User account for ${firstName} ${lastName} create successfully!`);
             resetForm();
+
+            setTimeout(() => {
+                navigate('/dashboard')
+            },1000);
         }catch(err: any){
             setError(err.response?.data?.message || 'An error occured.');
         }finally{
