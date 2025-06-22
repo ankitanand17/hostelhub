@@ -1,5 +1,5 @@
 //src/App.tsx
-import { Routes, Route, Navigate, RouterProvider } from "react-router-dom";
+import { Routes, Route, Navigate} from "react-router-dom";
 // Layouts
 import MainLayout from "./components/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
