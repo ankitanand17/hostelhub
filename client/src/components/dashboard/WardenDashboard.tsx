@@ -1,5 +1,7 @@
 //src/components/dashboard/WardenDashboard.tsx
 import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import WardenProfileCard from "./WardenProfileCard";
 
 const ActionCard = ({to, title, description, icon}: {to: string, title: string, description: string, icon: string}) => (
     <Link to={to} className="block p-6 transition-transform bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-50 hover:scale-105">
@@ -12,17 +14,23 @@ const ActionCard = ({to, title, description, icon}: {to: string, title: string, 
 );
 
 const WardenDashboard = () => {
+    const {user} = useAuth();
+
     return(
-        <div>
-            <h3 className="mb-6 text-2xl font-semibold text-gray-700">Warden Action</h3>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <ActionCard to="admin/add-student"
-                    title="Add New Student"
-                    description="Create a user account for a new student"
-                    icon="👤+"
-                />
+        <div className="space-y-8">
+            <WardenProfileCard user={user} />
+            <div>
+                <h3 className="mb-6 text-2xl font-semibold text-gray-700">Warden Action</h3>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <ActionCard to="/admin/add-student"
+                        title="Add New Student"
+                        description="Create a user account for a new student"
+                        icon="👤+"
+                    />
+                </div>
             </div>
         </div>
+        
     );
 };
 

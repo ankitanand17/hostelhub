@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 // Layouts
 import MainLayout from "./components/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProfileCompletionGuard from "./components/ProfileCompletionGuard";
 //Pages
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -10,7 +11,7 @@ import LandingPage from "./pages/LandingPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import CommitteePage from "./pages/CommitteePage";
 import RegisterStudentPage from "./pages/admin/RegisterStudentPage";
-
+import UpdateStaffProfilePage from "./pages/admin/StaffProfilePage";
 
 function App() {
   return(
@@ -20,13 +21,17 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/committee" element={<CommitteePage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/staff/profile" element={<UpdateStaffProfilePage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<DashboardPage />}/>
-          <Route path="/add-student" element={<RegisterStudentPage />}/>
+          <Route element={<ProfileCompletionGuard />}> 
+            <Route path="/dashboard" element={<DashboardPage />}/>
+            <Route path="/admin/add-student" element={<RegisterStudentPage />}/>
+          </Route>
+          
         </Route>
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
   );
 }

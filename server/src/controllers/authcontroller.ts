@@ -1,25 +1,10 @@
 // server/src/controllers/authcontroller.ts
 import { Request, Response } from 'express';
-import { registerStudent, registerStaff } from '../services/authService';
+import { registerStaff } from '../services/authService';
 import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-// This function is correct. No changes needed.
-export const handleStudentRegistration = async (req: Request, res: Response) => {
-    try {
-        const newUser = await registerStudent(req.body);
-        res.status(201).json({ message: 'Student registered successfully', userId: newUser.id });
-    } catch (error: any) {
-        if (error.code === 'P2002') {
-            const field = error.meta?.target?.[0] || 'field';
-            res.status(409).json({ message: `A user with this ${field} already exists.` });
-            return;
-        }
-        console.error(error);
-        res.status(500).json({ message: 'An error occurred during registration.' });
-    }
-};
 
 // This function is correct. No changes needed.
 export const handleLogin = async (req: Request, res: Response) => {
@@ -31,7 +16,10 @@ export const handleLogin = async (req: Request, res: Response) => {
     }
 
     try {
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await prisma.user.findUnique({ 
+            where: { email }, 
+            include: {staffProfile: true, studentProfile: true}  
+        });
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
             res.status(401).json({ message: 'Invalid credentials.' });

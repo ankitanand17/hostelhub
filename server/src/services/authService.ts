@@ -4,51 +4,6 @@ import { User, StudentProfile, StaffProfile, School, Role, Prisma } from '../gen
 import bcrypt from 'bcryptjs';
 
 // --- STUDENT REGISTRATION ---
-/*Defines the data structure for a new student registration.*/
-type StudentRegistrationData = Omit<StudentProfile, 
-    'id' | 'userId' | 'createdAt' | 'updatedAt' | 'isActive' | 
-    'adminSubRole' | 'adminRoleAssignedAt' | 'adminRoleEndedAt'
-> & {
-    email: User['email'];
-    password: User['password'];
-    firstName: User['firstName'];
-    lastName: User['lastName'];
-};
-
-/*** Handles the logic for registering a new student.*/
-export const registerStudent = async (data: StudentRegistrationData) => {
-    const { 
-        email, password, firstName, lastName, rollNumber, department, 
-        school, studentContactNumber, guardianName, guardianContact,
-        courseStartDate, expectedCourseEndDate, cgpa, sgpa
-    } = data;
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-        const user = await tx.user.create({
-            data: {
-                firstName, lastName, email,
-                password: hashedPassword,
-                role: 'STUDENT',
-            },
-        });
-
-        await tx.studentProfile.create({
-            data: {
-                userId: user.id,
-                rollNumber, department, school, studentContactNumber, 
-                guardianName, guardianContact,
-                courseStartDate: new Date(courseStartDate),
-                expectedCourseEndDate: new Date(expectedCourseEndDate),
-                cgpa, sgpa,
-            },
-        });
-        return user;
-    });
-    return newUser;
-};
-
 
 // --- STAFF REGISTRATION (NEW) ---
 /*Defines the data structure for a new staff registration.*/

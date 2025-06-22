@@ -20,6 +20,7 @@ const DashboardPage = () => {
       case 'WARDEN':
         return <WardenDashboard />;
       case 'HOSTEL_ADMIN':
+        return <AdminDashboard />;
       case 'MESS_ADMIN':
         return <AdminDashboard />;
       case 'STUDENT':

@@ -69,6 +69,7 @@ model StudentProfile {
   studentContactNumber String
   guardianName         String
   guardianContact      String
+  profilePhotoUrl      String?
   cgpa                 Float?
   sgpa                 Float?
 
@@ -104,6 +105,7 @@ model StaffProfile {
   officeLocation     String?
   jobTitle           String
   description        String?
+  profilePhotoUrl    String?
   isActive           Boolean   @default(true)
   startDate          DateTime  @default(now())
   endDate            DateTime?

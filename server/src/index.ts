@@ -1,6 +1,11 @@
+//server/src/index.ts
 import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import authRoutes from './routes/authrRoutes';
+import userRoutes from "./routes/userRoutes";
+import staffRoutes from "./routes/staffRoutes"
+import path from 'path';
 
 dotenv.config();
 
@@ -18,11 +23,12 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 //routes
-import authRoutes from "./routes/authrRoutes";
+app.use('/public', express.static(path.join(__dirname, '..', 'public')));
 app.use('/api/auth', authRoutes);
 
-import userRoutes from "./routes/userRoutes";
 app.use('/api/users', userRoutes);
+
+app.use('/api/staff', staffRoutes);
 
 app.get('/api', (req: Request, res: Response) => {
     res.send('Hello from HostelHub Server!');

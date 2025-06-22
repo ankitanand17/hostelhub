@@ -4,6 +4,7 @@ import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import prisma from '../lib/prisma';
 import { Role, AdminSubRole, Prisma} from '../generated/prisma';
 import bcrypt from 'bcryptjs';
+import { profile } from 'console';
 
 // A map to validate that the sub-role corresponds to the main role
 const roleToSubRoleMap: Record<string, AdminSubRole[]> = {
@@ -132,7 +133,8 @@ export const createStudentUser = async (req: AuthenticatedRequest, res: Response
                 lastName,
                 email,
                 password:hashedPassword,
-                role: 'STUDENT'
+                role: Role.STUDENT,
+                isActive: true,
             },
         });
 
@@ -145,5 +147,71 @@ export const createStudentUser = async (req: AuthenticatedRequest, res: Response
         }
         console.error(error);
         res.status(500).json({message: 'An error occured while creating a student user.'});
+    }
+};
+
+/*Gets the staff profile for the currently logged-in user.*/
+export const getMyStaffProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const userId = req.user?.userId;
+    if(!userId){
+        res.status(401).json({message: "Authentication error."});
+        return;
+    }
+
+    try{
+        const staffProfile = await prisma.staffProfile.findUnique({
+            where: { userId },
+        });
+
+        if(!staffProfile){
+            res.status(404).json({message: "Staff Profile not found. Please complete your profile."});
+            return;
+        }
+        res.status(200).json(staffProfile);
+    }catch(error){
+        console.error("Error fetching staff Profile", error);
+        res.status(500).json({message: "Internal server error"});
+    }
+};
+
+/*Create and Update staff Profile */
+export const createOrUpdateMyStaffProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const userId = req.user?.userId;
+    if(!userId){
+        res.status(401).json({message: "Authenticate Error"});
+        return;
+    }
+    const {staffContactNumber, department, jobTitle, officeLocation, description} = req.body;
+
+    if ( !staffContactNumber || !department || !jobTitle || !officeLocation){
+        res.status(400).json({message: "Contact Number, department, jobtitle and office Location are required"});
+        return;
+    }
+
+    let profilePhotoUrl : string | undefined = undefined;
+    if(req.file){
+        const filePath = req.file.path.replace(/\\/g, '/');
+        profilePhotoUrl = `${req.protocol}: //${req.get('host')}/${filePath}`;
+    }
+    
+    try{
+        const dataToUpsert = {
+            staffContactNumber, 
+            department, 
+            jobTitle, 
+            officeLocation, 
+            description,
+            ...(profilePhotoUrl && {profilePhotoUrl})
+        };
+
+        const staffProfile = await prisma.staffProfile.upsert({
+            where: {userId},
+            update: dataToUpsert,
+            create: {userId, ...dataToUpsert }
+        });
+        res.status(200).json({message: "Profile Updateed successfully", profile: staffProfile});
+    }catch(error){
+        console.error("Error updating staff profile:",error);
+        res.status(500).json({message: "An error occur while updating staff profile."});
     }
 };

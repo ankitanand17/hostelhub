@@ -6,7 +6,7 @@ import type { User } from "../types";
 const getInitials = (user: User | null) => {
     if(!user) return '';
     const firstNameInitials = user.firstName ? user.firstName[0] : '';
-    const lastNameInitials = user.lastname ? user.lastname[0] : '';
+    const lastNameInitials = user.lastName ? user.lastName[0] : '';
     return `${firstNameInitials}${lastNameInitials}`.toUpperCase();
 };
 
@@ -29,12 +29,20 @@ const Navbar = () => {
 
                 <div>
                     {user? (
-                        <button onClick={() => navigate('/dashboard')} 
+                        <button onClick={() => navigate('/dashboard')}
                             className="flex items-center justify-center w-10 h-10 font-bold text-white bg-indigo-500 rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" 
                             aria-label="Go to Dashboard">
-                            {getInitials(user)}
+                            {user.staffProfile?.profilePhotoUrl ? (
+                                <img 
+                                    src={user.staffProfile.profilePhotoUrl}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                              getInitials(user)  
+                            )}
                         </button>
-                    ): (
+                    ) : (
                         <Link to='/login' className="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
                             Login
                         </Link>

@@ -27,7 +27,7 @@ const RegisterStudentPage = () => {
         setSuccess(null);
 
         try{
-            await api.post('/user/create-student', {
+            await api.post('/users/create-student', {
                 firstName, lastName, email, password
             });
             setSuccess(`User account for ${firstName} ${lastName} create successfully!`);
@@ -45,17 +45,29 @@ const RegisterStudentPage = () => {
                 <h1 className="mb-6 text-3xl font-bold text-gray-800">Create Student Account</h1>
                 <p className="mb-6 text-gray-600">This will create a basic user account. The student will be prompted to complete their profile upon their first login.</p>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <input type="text" placeholder="First Name" value={firstName} onChange={e => setFirstName(e.target.value)} required className="input-style" />
-                    <input type="text" placeholder="Last Name" value={lastName} onChange={e => setLastName(e.target.value)} required className="input-style" />
-                    <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} required className="input-style" />
-                    <input type="password" placeholder="Temporary Password" value={password} onChange={e => setPassword(e.target.value)} required className="input-style" />
+                    <div>
+                        <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
+                        <input name="firstName" type="text" placeholder="First Name" value={firstName} onChange={e => setFirstName(e.target.value)} required className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm text-black" />
+                    </div>
+                    <div>
+                        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+                        <input name="lastName" type="text" placeholder="Last Name" value={lastName} onChange={e => setLastName(e.target.value)} required className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm text-black" />
+                    </div>
+                    <div>
+                        <label htmlFor="eamil" className="block text-sm font-medium text-gray-700">Email</label>
+                        <input name="eamil" type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} required className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm text-black" />
+                    </div>
+                    <div>
+                        <label htmlFor="passsword" className="block text-sm font-medium text-gray-700">Password</label>
+                        <input name="password" type="password" placeholder="Temporary Password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm text-black" />
+                    </div>
 
                     <div>
                         <button type="submit" disabled={isLoading} className="w-full px-4 py-3 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:bg-gray-400">
                             {isLoading ?  'Creating Account...' : 'Create Account'}
                         </button>
                         {success && <p className="mt-4 text-center text-green-600">{success}</p>}
-                        [error && <p className="mt-4 text-center text-green-600">{error}</p>]
+                        {error && <p className="mt-4 text-center text-green-600">{error}</p>}
                     </div>
                 </form>
             </div>
