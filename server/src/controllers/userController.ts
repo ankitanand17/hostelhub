@@ -254,4 +254,71 @@ export const createStaffUser = async(req: AuthenticatedRequest, res: Response): 
         console.error(error);
         res.status(500).json({message: 'An error occurred while creating the staff user.'});
     }
-}
+};
+
+/*Get the student profile for the currently logged-in user */
+export const getMyStudentProfile = async(req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const userId = req.user?.userId;
+
+    if(!userId){
+        res.status(401).json({message: "Authenticate Error"});
+        return;
+    }
+    try{
+        const studentProfile = await prisma.studentProfile.findUnique({
+            where: {userId}
+        });
+
+        if(!studentProfile){
+            res.status(404).json({message: "Student Profile not found"});
+            return;
+        }
+
+        res.status(200).json(studentProfile);
+    }catch(error){
+        res.status(500).json({message: "Internal server error!!"});
+    }
+};
+
+/*Create and Update student profile */
+export const createOrUpdateMyStudentProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const userId = req.user?.userId;
+
+    if(!userId){
+        res.status(404).json({message: "Authentication Error."});
+        return;
+    }
+
+    const {rollNumber, roomNumber, currentSem, sgpa, cgpa, department, school, studentContactNumber, guardianName, guardianContact, courseStartDate, expectedCourseEndDate} = req.body;
+
+    if(!rollNumber || !department || !school || !studentContactNumber || !guardianContact || !guardianName || !courseStartDate || ! expectedCourseEndDate){
+        res.status(400).json({message: "All fields are required."});
+        return;
+    }
+
+    let profilePhotoUrl : string | undefined = undefined;
+    if(req.file){
+        const filePath = req.file.path.replace(/\\/g, '/');
+        profilePhotoUrl = `${req.protocol}://${req.get('host')}/${filePath}`;
+    }
+
+    try{
+        const dataToUpsert = {rollNumber, roomNumber,currentSem, department, school, studentContactNumber, guardianName, guardianContact,
+            cgpa: cgpa ? +cgpa : null,
+            sgpa: sgpa ? +sgpa : null, 
+            courseStartDate: new Date(courseStartDate),
+            expectedCourseEndDate: new Date(expectedCourseEndDate),
+            ...(profilePhotoUrl && {profilePhotoUrl})
+        };
+
+        const studentProfile = await prisma.studentProfile.upsert({
+            where: {userId},
+            update: dataToUpsert,
+            create: {userId, ...dataToUpsert}
+        });
+        res.status(200).json({message: "Profile Update successfully.", profile: studentProfile});
+    }catch(error){
+        console.error("Error Updating student profile:",error);
+        res.status(500).json({message: "An error occurred while updating the profile."});
+    }
+};

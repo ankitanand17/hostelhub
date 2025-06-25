@@ -72,6 +72,8 @@ model StudentProfile {
   profilePhotoUrl      String?
   cgpa                 Float?
   sgpa                 Float?
+  roomNumber           String?
+  currentSem           String
 
   // Room allocation (to be linked later)
   // roomId String?

@@ -11,6 +11,7 @@ export interface StaffProfile {
 export interface StudentProfile {
     id: string;
     rollNumber: string;
+    roomNumber?: string | null;
 }
 
 export interface User {

@@ -12,7 +12,9 @@ interface AuthContextType {
     logout: () => void;
     isLoading: boolean;
     staffProfileExists: boolean;
+    studentProfileExists: boolean;
     checkStaffProfile: () => Promise<void>;
+    checkStudentProfile: () => Promise<void>;
 }
   
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [staffProfileExists, setStaffProfileExists] = useState(false);
+  const [studentProfileExists, setStudentProfileExists] = useState(false);
 
   const checkStaffProfile = useCallback(async () => {
     if(!user || (user.role !== 'WARDEN' && user.role !== 'CARETAKER')){
@@ -36,11 +39,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   },[user]);
 
+  const checkStudentProfile = useCallback(async () => {
+    if(!user || (user.role !== 'STUDENT' && user.role !== 'HOSTEL_ADMIN' && user.role !== 'MESS_ADMIN')){
+      setStudentProfileExists(false);
+      return;
+    }
+    try{
+      await api.get('/student/profile');
+      setStudentProfileExists(true);
+    }catch(error){
+        setStudentProfileExists(false);
+    }
+  }, [user]);
+
   useEffect(() => {
     if(!isLoading && user){
       checkStaffProfile();
+      checkStudentProfile();
     }
-  },[user,isLoading, checkStaffProfile]);
+  },[user,isLoading, checkStaffProfile, checkStudentProfile]);
 
   useEffect(() => {
     const restoreSession = async () => {
@@ -79,8 +96,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   },[]);
 
   //Memoize the context value
-  const value = useMemo(() => ({ user, token, login, logout, isLoading, staffProfileExists, checkStaffProfile}),
-    [user, token, isLoading, staffProfileExists, checkStaffProfile] // The dependency array
+  const value = useMemo(() => ({ user, token, login, logout, isLoading, staffProfileExists, checkStaffProfile, studentProfileExists, checkStudentProfile}),
+    [user, token, isLoading, staffProfileExists, checkStaffProfile, studentProfileExists, checkStudentProfile]
   );
 
   return (

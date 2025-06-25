@@ -13,6 +13,7 @@ import CommitteePage from "./pages/CommitteePage";
 import RegisterStudentPage from "./pages/admin/RegisterStudentPage";
 import UpdateStaffProfilePage from "./pages/admin/StaffProfilePage";
 import CreateStaffPage from "./pages/admin/CreateStaffPage";
+import StudentProfilePage from "./pages/student/StudentProfilePage";
 
 function App() {
   return(
@@ -22,7 +23,6 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/committee" element={<CommitteePage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/staff/profile" element={<UpdateStaffProfilePage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
         <Route element={<ProtectedRoute />}>
@@ -31,7 +31,8 @@ function App() {
             <Route path="/admin/add-student" element={<RegisterStudentPage />}/>
             <Route path="/admin/add-staff" element={<CreateStaffPage />}/>
           </Route>
-          
+          <Route path="/staff/profile" element={<UpdateStaffProfilePage />} />
+          <Route path="/student/profile" element={<StudentProfilePage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
