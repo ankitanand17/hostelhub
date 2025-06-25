@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import WardenProfileCard from "./WardenProfileCard";
+import StudentList from "./StudentList";
 
 const ActionCard = ({to, title, description, icon}: {to: string, title: string, description: string, icon: string}) => (
     <Link to={to} className="block p-6 transition-transform bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-50 hover:scale-105">
@@ -31,6 +32,12 @@ const WardenDashboard = () => {
                         title="Add new Warden or CareTaker"
                         description="Onboard a new Warden or Caretaker account."
                         icon="🧑‍🔧"
+                    />
+                    <ActionCard
+                        to="/admin/all-students"
+                        title="View All Students"
+                        description="Search, view, and manage all student records."
+                        icon="📚"
                     />
                 </div>
             </div>

@@ -46,23 +46,3 @@ export const handleLogin = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'An error occurred during login.' });
     }
 };
-
-// NEW: Handler for Staff Registration
-export const handleStaffRegistration = async (req: Request, res: Response) => {
-    try {
-        const newStaff = await registerStaff(req.body);
-        res.status(201).json({ message: 'Staff member registered successfully', userId: newStaff.id });
-    } catch (error: any) {
-        if (error.code === 'P2002') {
-            const field = error.meta?.target?.[0] || 'field';
-            res.status(409).json({ message: `A user with this ${field} already exists.` });
-            return;
-        }
-        if (error.message.includes('Invalid role')) {
-            res.status(400).json({ message: error.message });
-            return;
-        }
-        console.error(error);
-        res.status(500).json({ message: 'An error occurred during staff registration.' });
-    }
-};

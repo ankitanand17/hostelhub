@@ -12,6 +12,7 @@ export interface StudentProfile {
     id: string;
     rollNumber: string;
     roomNumber?: string | null;
+    _count?: { disciplinaryActions: number };
 }
 
 export interface User {

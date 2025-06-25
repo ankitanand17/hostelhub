@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@layer components {
+    /* ... .input-style ... */
+    .th-style { @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider; }
+    .td-style { @apply px-6 py-4 whitespace-nowrap text-sm text-gray-700; }
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

@@ -14,6 +14,8 @@ import RegisterStudentPage from "./pages/admin/RegisterStudentPage";
 import UpdateStaffProfilePage from "./pages/admin/StaffProfilePage";
 import CreateStaffPage from "./pages/admin/CreateStaffPage";
 import StudentProfilePage from "./pages/student/StudentProfilePage";
+import StudentDetailsPage from "./pages/admin/StudentDetailsPage";
+import AllStudentsPage from "./pages/admin/AllStudentsPage";
 
 function App() {
   return(
@@ -30,6 +32,9 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />}/>
             <Route path="/admin/add-student" element={<RegisterStudentPage />}/>
             <Route path="/admin/add-staff" element={<CreateStaffPage />}/>
+            <Route path="/admin/all-students" element={<AllStudentsPage />} />
+            <Route path="/student/:studentProfileId" element={<StudentDetailsPage />} />
+            <Route path="/student/:studentProfileId/actions" element={<StudentDetailsPage />} />
           </Route>
           <Route path="/staff/profile" element={<UpdateStaffProfilePage />} />
           <Route path="/student/profile" element={<StudentProfilePage />} />

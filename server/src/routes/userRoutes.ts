@@ -1,7 +1,7 @@
 // server/src/routes/userRoutes.ts
 import { Router } from 'express';
 import { authenticateToken, authorizeRole } from '../middleware/authMiddleware';
-import { promoteStudent, demoteStudent, createStudentUser, createStaffUser } from '../controllers/userController';
+import { promoteStudent, demoteStudent, createStudentUser, createStaffUser, createDisciplinaryAction, getActionsForStudent, getAllStudents } from '../controllers/userController';
 
 const router = Router();
 
@@ -20,5 +20,12 @@ router.post('/create-student', createStudentUser);
 
 //Route for creating a new Staff
 router.post('/create-staff', createStaffUser);
+
+// --- ADD DISCIPLINARY ROUTES ---
+// Warden can view actions for any student
+router.get('/student/:studentProfileId/actions', getActionsForStudent);
+
+//Route to the list of students
+router.get('/students', getAllStudents);
 
 export default router;

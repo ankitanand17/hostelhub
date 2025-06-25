@@ -1,6 +1,6 @@
 // server/src/routes/authRoutes.ts
 import { Router } from 'express';
-import { handleLogin, handleStaffRegistration } from '../controllers/authcontroller';
+import { handleLogin } from '../controllers/authcontroller';
 import { authenticateToken, authorizeRole } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -11,11 +11,5 @@ router.post('/login', handleLogin);
 //STUDENT REGISTRATION ROUTE
 
 //STAFF REGISTRATION ROUTE
-router.post(
-    '/register/staff', 
-    authenticateToken, 
-    authorizeRole(['WARDEN']), 
-    handleStaffRegistration
-);
 
 export default router;

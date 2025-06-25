@@ -4,7 +4,6 @@ import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import prisma from '../lib/prisma';
 import { Role, AdminSubRole, Prisma} from '../generated/prisma';
 import bcrypt from 'bcryptjs';
-import { profile } from 'console';
 
 // A map to validate that the sub-role corresponds to the main role
 const roleToSubRoleMap: Record<string, AdminSubRole[]> = {
@@ -320,5 +319,122 @@ export const createOrUpdateMyStudentProfile = async (req: AuthenticatedRequest, 
     }catch(error){
         console.error("Error Updating student profile:",error);
         res.status(500).json({message: "An error occurred while updating the profile."});
+    }
+};
+
+/*Creates a new disciplinary action for a specific student. */
+export const createDisciplinaryAction = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const wardenId = req.user?.userId;
+    if(!wardenId){
+        res.status(401).json({message: "Authenticate Error"});
+        return;
+    }
+
+    const {studentProfileId, actionType, reason} = req.body;
+    if( !studentProfileId || !actionType || !reason){
+        res.status(400).json({message: 'Student profile ID, action type, and reason are required.'})
+        return;
+    }
+
+    try{
+        const newAction = await prisma.disciplinaryAction.create({
+            data: {
+                studentProfileId,
+                wardenId,
+                actionType,
+                reason,
+            },
+        });
+        res.status(201).json(newAction);
+    }catch(error){
+        console.error("Error Creating Disciplinary Action:", error);
+        res.status(500).json({message: "Failed to create disciplinary Action."});
+    }
+};
+
+/*Gets all disciplinary actions for a specific student. */
+export const getActionsForStudent = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const {studentProfileId} = req.params;
+
+    try{
+        const actions = await prisma.disciplinaryAction.findMany({
+            where: {studentProfileId},
+            orderBy: {dateIssued: 'desc'},
+            include: {issuedBy: {select: {firstName: true, lastName: true}}}
+        });
+        res.status(200).json(actions);
+    }catch(error){
+        res.status(500).json({message: "Failed to fetch Actions."});
+    }
+};
+
+/*get the list of all the student with filtering and serching*/
+export const getAllStudents = async (req:AuthenticatedRequest, res: Response): Promise<void> => {
+    const {search} = req.query;
+
+    const whereClause: Prisma.UserWhereInput = {
+        role: { in: ['STUDENT', 'HOSTEL_ADMIN', 'MESS_ADMIN'] },
+    };
+
+    if (search && typeof search === 'string') {
+        whereClause.OR = [
+            { firstName: { contains: search, mode: 'insensitive' } },
+            { lastName: { contains: search, mode: 'insensitive' } },
+            { studentProfile: { rollNumber: { contains: search, mode: 'insensitive' } } },
+            { studentProfile: { roomNumber: { contains: search, mode: 'insensitive' } } },
+        ];
+    }
+    try{
+        const students = await prisma.user.findMany({
+            where: whereClause,
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                role: true,
+                studentProfile: {
+                    select:{
+                        id: true,
+                        rollNumber: true,
+                        roomNumber: true,
+                        _count: {
+                            select: {disciplinaryActions: true},
+                        },
+                    },
+                },
+            },
+            orderBy: {firstName: 'asc'}
+        });
+        res.status(200).json(students)
+    }catch(error){
+        console.error('Error fetching student:', error);
+        res.status(500).json({message: 'Failed to fetch student list.'});
+    }
+};
+
+/*Gets the full details of a single student by their PROFILE ID. */
+export const getStudentDetails = async (req:AuthenticatedRequest, res: Response): Promise<void> => {
+    const {studentProfileId} = req.params;
+
+    try{
+        const studentProfile = await prisma.studentProfile.findUnique({
+            where: {id: studentProfileId},
+            include: {
+                user: true,
+                disciplinaryActions: {
+                    orderBy: {dateIssued: 'desc'},
+                    include: {issuedBy: {select: {firstName: true, lastName: true}}}
+                }
+            },
+        });
+
+        if(!studentProfile){
+            res.status(404).json({message: 'Student Profile not found.'});
+            return;
+        }
+        res.status(200).json(studentProfile);
+    }catch(error){
+        console.error("Error fetching student details:",error);
+        res.status(500).json({message: "Failed to fetch student details."});
     }
 };
