@@ -9,7 +9,7 @@ interface AddActionModalProps {
   isOpen: boolean;
   onClose: () => void;
   studentProfileId: string;
-  onActionAdded: () => void; // A function to tell the parent page to refresh
+  onActionAdded: () => void;
 }
 
 const AddActionModal = ({ isOpen, onClose, studentProfileId, onActionAdded }: AddActionModalProps) => {
@@ -45,7 +45,6 @@ const AddActionModal = ({ isOpen, onClose, studentProfileId, onActionAdded }: Ad
     return (
         // Modal Overlay
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            {/* Modal Content */}
             <div className="w-full max-w-lg p-8 bg-white rounded-lg shadow-2xl">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-gray-800">Add Disciplinary Action</h2>

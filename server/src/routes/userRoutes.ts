@@ -21,7 +21,6 @@ router.post('/create-student', createStudentUser);
 //Route for creating a new Staff
 router.post('/create-staff', createStaffUser);
 
-// --- ADD DISCIPLINARY ROUTES ---
 // Warden can view actions for any student
 router.get('/student/:studentProfileId/actions', getActionsForStudent);
 

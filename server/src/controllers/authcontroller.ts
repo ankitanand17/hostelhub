@@ -1,6 +1,5 @@
 // server/src/controllers/authcontroller.ts
 import { Request, Response } from 'express';
-import { registerStaff } from '../services/authService';
 import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';

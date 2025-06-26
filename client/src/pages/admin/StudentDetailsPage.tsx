@@ -3,40 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../../services/api';
 import AddActionModal from '../../components/modals/AddActionModal';
-
-// You will need to expand your 'types' to include a full student with nested objects
-interface FullStudentProfile {
-    id: string;
-    rollNumber: string;
-    roomNumber: string | null;
-    currentSem: string ;
-    department: string;
-    school: string;
-    studentContactNumber: string;
-    guardianName: string;
-    guardianContact: string;
-    cgpa: number | null;
-    sgpa: number | null;
-    courseStartDate: string;
-    expectedCourseEndDate: string;
-    profilePhotoUrl: string | null;
-    user: {
-        firstName: string;
-        lastName: string;
-        email: string;
-        role: string;
-    };
-    disciplinaryActions: Action[];
-}
-
-interface Action {
-    id: string;
-    actionType: string;
-    reason: string;
-    dateIssued: string;
-    status: string;
-    issuedBy: { firstName: string, lastName: string };
-}
+import type { Action, FullStudentProfile } from '../../types';
 
 // Reusable card for showing an action
 const ActionCard = ({ action }: { action: Action }) => (

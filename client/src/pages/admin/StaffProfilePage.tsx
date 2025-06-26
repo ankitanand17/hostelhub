@@ -3,8 +3,10 @@ import React, { useState, useEffect, } from "react";
 import type { FormEvent } from "react";
 import api from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const UpdateStaffProfilePage = () => {
+    const navigate = useNavigate();
     const {user, checkStaffProfile} = useAuth();
 
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
@@ -41,6 +43,9 @@ const UpdateStaffProfilePage = () => {
                         setImagePreview(response.data.profilePhotoUrl);
                     }
                 }
+                setTimeout(() => {
+                    navigate('/dashboard',)
+                },1000)
             }catch(err: any){
                 console.log("No existing profile found, user can create one.");
             }finally{
