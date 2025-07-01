@@ -6,6 +6,7 @@ import authRoutes from './routes/authrRoutes';
 import userRoutes from "./routes/userRoutes";
 import staffRoutes from "./routes/staffRoutes"
 import studentRoutes from "./routes/studentRoutes"
+import publicRoutes from './routes/publicRoutes';
 import path from 'path';
 
 dotenv.config();
@@ -32,6 +33,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/staff', staffRoutes);
 
 app.use('/api/student', studentRoutes);
+
+app.use('/api/public', publicRoutes);
 
 app.get('/api', (req: Request, res: Response) => {
     res.send('Hello from HostelHub Server!');

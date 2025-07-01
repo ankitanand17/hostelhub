@@ -2,7 +2,7 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import prisma from '../lib/prisma';
-import { Role, AdminSubRole, Prisma} from '../generated/prisma';
+import { Role, AdminSubRole, Prisma, ActionStatus } from '../generated/prisma';
 import bcrypt from 'bcryptjs';
 
 // A map to validate that the sub-role corresponds to the main role
@@ -57,11 +57,14 @@ export const promoteStudent = async (req: AuthenticatedRequest, res: Response): 
         res.status(200).json({ message: `Student promoted to ${newRole} (${adminSubRole}) successfully.`, user: updatedUser });
 
     } catch (error: any) {
+        if (error.code === 'P2025'){
+            res.status(404).json({ message: 'The student exists, but they do not have a profile to update. Please ensure the student has completed their profile.'});
+            return;
+        }
         if (error.message === 'User is not a promotable student.') {
             res.status(404).json({ message: 'The specified user is not a student or does not exist.' });
             return;
         }
-        console.error(error);
         res.status(500).json({ message: 'An error occurred while promoting the student.' });
     }
 };
@@ -105,11 +108,14 @@ export const demoteStudent = async (req: AuthenticatedRequest, res: Response): P
         res.status(200).json({ message: 'Student admin demoted to STUDENT successfully.', user: updatedUser });
 
     } catch (error: any) {
+        if (error.code === 'P2025'){
+             res.status(404).json({ message: 'The student exists, but they do not have a profile to update.'});
+             return;
+        }
         if (error.message === 'User is not a demotable student admin.') {
             res.status(404).json({ message: 'The specified user is not a student admin or does not exist.' });
             return;
         }
-        console.error(error);
         res.status(500).json({ message: 'An error occurred while demoting the student.' });
     }
 };
@@ -352,6 +358,35 @@ export const createDisciplinaryAction = async (req: AuthenticatedRequest, res: R
     }
 };
 
+/*Updates an existing disciplinary action (e.g., to change its status or reason). */
+export const updateDisciplinaryAction = async (req: AuthenticatedRequest, res:Response): Promise<void> => {
+    const {actionId} = req.params;
+
+    const {reason,status} = req.body;
+    if (!reason && !status) {
+        res.status(400).json({ message: "Either a new reason or a new status is required." });
+        return;
+    }
+
+    try{
+        const updatedAction = await prisma.disciplinaryAction.update({
+            where: {id: actionId},
+            data: {
+                ...(reason && {reason}),
+                ...(status && {status: status as ActionStatus}),
+            }
+        });
+        res.status(200).json(updatedAction);
+    }catch (error: any) {
+        if (error.code === 'P2025') { // "Record to update not found"
+            res.status(404).json({ message: "Disciplinary action not found." });
+            return;
+        }
+        console.error("Error updating disciplinary action:", error);
+        res.status(500).json({ message: "Failed to update disciplinary action." });
+    }
+}
+
 /*Gets all disciplinary actions for a specific student. */
 export const getActionsForStudent = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const {studentProfileId} = req.params;
@@ -436,5 +471,50 @@ export const getStudentDetails = async (req:AuthenticatedRequest, res: Response)
     }catch(error){
         console.error("Error fetching student details:",error);
         res.status(500).json({message: "Failed to fetch student details."});
+    }
+};
+
+/*Fetches all users who are part of the hostel committee.This includes all staff and student admins.*/
+export const getCommitteeMembers = async (req:AuthenticatedRequest, res: Response): Promise<void> => {
+    try{
+        const committeeMembers = await prisma.user.findMany({
+            where: {
+                role: {
+                    in: ['WARDEN', 'CARETAKER', 'HOSTEL_ADMIN', 'MESS_ADMIN']
+                },
+                isActive: true
+            },
+            select: {
+                id:true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                role: true,
+                staffProfile:{
+                    select: {
+                        id: true,
+                        staffContactNumber: true,
+                        profilePhotoUrl: true,
+                        jobTitle: true
+                    }
+                },
+                studentProfile:{
+                    select:{
+                        id: true,
+                        studentContactNumber: true,
+                        profilePhotoUrl: true,
+                        adminSubRole: true,
+                    }
+                }
+            },
+            orderBy:[
+                {role:'asc'},
+                {firstName: 'asc'}
+            ]
+        });
+        res.status(200).json(committeeMembers);
+    }catch (error) {
+        console.error("Error fetching committee members:", error);
+        res.status(500).json({ message: "Failed to fetch committee members." });
     }
 };

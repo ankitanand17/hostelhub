@@ -6,6 +6,11 @@ export interface StaffProfile {
   officeLocation?: string | null;
   description?: string | null;
   profilePhotoUrl?: string | null;
+  user: {
+        firstName: string;
+        lastName: string;
+        email: string;
+    };
 }
 
 export interface StudentProfile {
@@ -42,6 +47,9 @@ export interface FullStudentProfile {
   courseStartDate: string;
   expectedCourseEndDate: string;
   profilePhotoUrl: string | null;
+  adminSubRole: 'PREFECT' | 'ASSISTANT_PREFECT' | 'MESS_MANAGER' | null;
+  adminRoleAssignedAt: string | null;
+  adminRoleEndedAt: string | null;
   user: {
     firstName: string;
     lastName:string;
@@ -61,4 +69,24 @@ export interface User {
     
     staffProfile?: StaffProfile | null;
     studentProfile?: StudentProfile | null;
+}
+
+export interface CommitteeMember {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: string;
+    staffProfile?: {
+        id: string;
+        staffContactNumber: string | null;
+        profilePhotoUrl: string | null;
+        jobTitle: string | null;
+    } | null;
+    studentProfile?: {
+        id: string;
+        studentContactNumber: string | null;
+        profilePhotoUrl: string | null;
+        adminSubRole: string | null;
+    } | null;
 }

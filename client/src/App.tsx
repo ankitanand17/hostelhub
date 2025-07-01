@@ -16,6 +16,7 @@ import CreateStaffPage from "./pages/admin/CreateStaffPage";
 import StudentProfilePage from "./pages/student/StudentProfilePage";
 import StudentDetailsPage from "./pages/admin/StudentDetailsPage";
 import AllStudentsPage from "./pages/admin/AllStudentsPage";
+import StaffDetailsPage from "./pages/public/StaffDetailsPage";
 
 function App() {
   return(
@@ -24,6 +25,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/committee" element={<CommitteePage />} />
+          <Route path="/staff/:userId/details" element={<StaffDetailsPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
